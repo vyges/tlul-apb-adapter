@@ -234,7 +234,7 @@
   "documentation": {
     "overview": "docs/design_specification.md",
     "architecture": "docs/architecture.md",
-    "integration_guide": "docs/fft-integration-guide.md"
+    "integration_guide": "docs/fft_integration_guide.md"
   },
   "examples": [
     {

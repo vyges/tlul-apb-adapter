@@ -236,7 +236,7 @@ tlul-apb-adapter/
 ├── docs/
 │   ├── design_specification.md  # Interface, timing, verification plan (this file's pair)
 │   ├── architecture.md          # This document
-│   └── fft-integration-guide.md # Step-by-step FFT APB integration example
+│   └── fft_integration_guide.md # Step-by-step FFT APB integration example
 ├── examples/
 │   └── fft_tlul_wrapper.sv      # Wrapper: instantiates adapter + FFT APB port connection
 ├── constraints/

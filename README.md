@@ -46,7 +46,7 @@ tb/
 docs/
   design_specification.md  Interface definition, timing, verification plan
   architecture.md          Internal architecture, design decisions
-  fft-integration-guide.md Step-by-step FFT APB integration example
+  fft_integration_guide.md Step-by-step FFT APB integration example
 
 examples/
   fft_tlul_wrapper.sv      Wrapper: adapter + Vyges FFT Accelerator
@@ -140,7 +140,7 @@ make lint
 
 ## Integration with Vyges FFT Accelerator
 
-See [`docs/fft-integration-guide.md`](docs/fft-integration-guide.md) and [`examples/fft_tlul_wrapper.sv`](examples/fft_tlul_wrapper.sv) for a complete worked example connecting the [Vyges FFT Accelerator](https://github.com/vyges/fast-fourier-transform-ip) APB port to a TL-UL crossbar.
+See [`docs/fft_integration_guide.md`](docs/fft_integration_guide.md) and [`examples/fft_tlul_wrapper.sv`](examples/fft_tlul_wrapper.sv) for a complete worked example connecting the [Vyges FFT Accelerator](https://github.com/vyges/fast-fourier-transform-ip) APB port to a TL-UL crossbar.
 
 ---
 
