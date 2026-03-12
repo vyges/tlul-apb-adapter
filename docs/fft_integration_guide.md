@@ -1,11 +1,14 @@
 # FFT Accelerator TL-UL Integration Guide
 
-**IP Name:** tlul-apb-adapter  
-**Version:** 0.1.0  
-**Created:** 2026-03-12T22:17:25Z  
-**Updated:** 2026-03-12T22:17:25Z  
-**Author:** Vyges IP Development Team  
-**Applies to:** vyges/tlul-apb-adapter@0.1.0 + vyges/fast-fourier-transform-ip  
+-**IP Name:** tlul-apb-adapter  
+-**Version:** 0.1.0  
+-**Created:** 2026-03-12T22:17:25Z
+-**Updated:** 2026-03-12T22:17:25Z
+-**Author:** Vyges IP Development Team 
+**Applies to:** `vyges/tlul-apb-adapter@0.1.0` + `vyges/fast-fourier-transform-ip`
+**Last updated:** 2026-03-12
+
+---
 
 ## 1. Overview
 
