@@ -1,0 +1,38 @@
+# Simulation artifacts
+*.vcd
+*.fst
+*.vvp
+*.out
+sim.log
+
+# cocotb / iverilog build artifacts
+results.xml
+__pycache__/
+*.pyc
+*.pyo
+sim_build/
+.pytest_cache/
+
+# Verilator build
+obj_dir/
+
+# Yosys / OpenLane synthesis outputs
+*.blif
+*.asc
+*.bit
+*.edif
+synth_*/
+openlane/runs/
+
+# GTKWave config
+*.gtkw
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
