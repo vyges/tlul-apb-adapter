@@ -1,13 +1,11 @@
-# TL-UL to APB Adapter — Design Specification
+# TL-UL to APB Adapter Design Specification
 
-**IP Name:** `tlul-apb-adapter`
-**Namespace:** `vyges/tlul-apb-adapter`
-**Version:** 0.1.0
-**License:** Apache-2.0
-**Classification:** Infrastructure IP
-**Last updated:** 2026-03-12
-
----
+**IP Name:** tlul-apb-adapter  
+**Version:** 0.1.0  
+**Created:** 2026-03-12T22:17:25Z  
+**Updated:** 2026-03-12T22:17:25Z  
+**Author:** Vyges IP Development Team  
+**License:** Apache-2.0  
 
 ## 1. Purpose and Scope
 
