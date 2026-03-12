@@ -94,20 +94,11 @@ tlul_apb_adapter #(
 
 ### Run Simulations
 
-**SystemVerilog testbench (Icarus Verilog):**
+**cocotb + Verilator (primary):**
 ```bash
-iverilog -g2012 -o sim.vvp rtl/tlul_pkg.sv rtl/tlul_apb_adapter.sv \
-         tb/tb_tlul_apb_adapter.sv && vvp sim.vvp
-```
-
-**cocotb (Icarus Verilog):**
-```bash
-cd tb/cocotb && make SIM=icarus
-```
-
-**cocotb (Verilator):**
-```bash
-cd tb/cocotb && make SIM=verilator
+make sim
+# or directly:
+cd tb/cocotb && make
 ```
 
 **Lint:**
@@ -147,7 +138,7 @@ See [`docs/fft_integration_guide.md`](docs/fft_integration_guide.md) and [`examp
 ## Compatibility
 
 - **Bus fabrics**: OpenTitan TL-UL crossbar, Ibex RISC-V SoC, any TL-UL-compliant fabric
-- **Simulators**: Icarus Verilog (`iverilog`), Verilator, ModelSim/Xcelium
+- **Simulators**: Verilator (primary), ModelSim/Xcelium
 - **Synthesis**: Yosys, Synopsys Design Compiler, Vivado
 - **PDKs**: SKY130 (OpenLane), GF180MCU (OpenLane), any standard cell process
 - **FPGA**: Xilinx 7-series/UltraScale, Intel Cyclone/Arria, Lattice iCE40/ECP5

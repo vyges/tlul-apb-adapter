@@ -132,22 +132,18 @@
   ],
   "test": {
     "coverage": true,
-    "testbenches": ["cocotb", "systemverilog"],
-    "simulators": ["iverilog", "verilator"],
+    "testbenches": ["cocotb"],
+    "simulators": ["verilator"],
     "status": "passing",
     "cocotb_integration": {
       "status": "verified",
       "version": "v1.8+",
-      "simulators": ["icarus", "verilator"],
+      "simulators": ["verilator"],
       "makefile_approach": "standard",
-      "fallback_support": true
+      "fallback_support": false
     }
   },
   "flows": {
-    "icarus": {
-      "status": "verified",
-      "cocotb_integration": "working"
-    },
     "verilator": {
       "status": "verified",
       "cocotb_integration": "working"
@@ -247,7 +243,7 @@
   "compatibility": {
     "tools": {
       "synthesis": ["yosys", "design_compiler", "vivado", "quartus"],
-      "simulation": ["iverilog", "verilator", "modelsim", "xcelium"],
+      "simulation": ["verilator", "modelsim", "xcelium"],
       "formal": ["yosys-smtbmc", "sby"],
       "fpga": ["yosys", "nextpnr", "icestorm", "prjtrellis", "vivado", "quartus"]
     },

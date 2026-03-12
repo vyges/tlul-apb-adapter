@@ -6,7 +6,7 @@
 # Run with:
 #   cd tb/cocotb && make
 #
-# Requires: cocotb >= 1.8, cocotb-bus, iverilog or verilator
+# Requires: cocotb >= 1.8, verilator >= 5.0 (--timing support)
 
 import cocotb
 from cocotb.clock import Clock
@@ -367,7 +367,7 @@ async def tc09_stress_random_addresses(dut):
     cocotb.start_soon(clock.start())
     await reset_dut(dut)
 
-    rng = random.Random(0xVYGES if False else 42)  # deterministic seed
+    rng = random.Random(42)  # deterministic seed
     for i in range(20):
         addr   = rng.randint(0, 0xFFFF) << 2  # word-aligned
         wdata  = rng.randint(0, 0xFFFF_FFFF)

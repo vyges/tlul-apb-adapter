@@ -82,7 +82,7 @@ package tlul_pkg;
   // ---------------------------------------------------------------------------
   // Default / reset values
   // Note: struct parameter literals are not supported in all SystemVerilog
-  // tools (e.g. Icarus Verilog). Use per-field assignments in RTL instead.
+  // tools without full SV struct support. Use per-field assignments in RTL instead.
   // These are provided as documentation references only.
   //
   // TL_H2D_DEFAULT: a_valid=0, a_opcode=Get, a_size=2, d_ready=1, rest=0

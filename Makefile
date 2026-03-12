@@ -2,31 +2,18 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Top-level Makefile for tlul-apb-adapter
+# Simulator: Verilator (via cocotb)
 
-RTL_FILES  = rtl/tlul_pkg.sv rtl/tlul_apb_adapter.sv
-TB_FILE    = tb/tb_tlul_apb_adapter.sv
-SIM_OUT    = sim.vvp
+RTL_FILES = rtl/tlul_pkg.sv rtl/tlul_apb_adapter.sv
 
-.PHONY: all sim sim-cocotb lint clean help
+.PHONY: all sim lint waves clean help
 
 all: sim
 
 # -----------------------------------------------------------------------
-# Simulation: iverilog + vvp
+# Simulation: cocotb + Verilator
 # -----------------------------------------------------------------------
-sim: $(SIM_OUT)
-	vvp $(SIM_OUT)
-
-$(SIM_OUT): $(RTL_FILES) $(TB_FILE)
-	iverilog -g2012 -Wall -o $@ $^
-
-# -----------------------------------------------------------------------
-# cocotb simulation
-# -----------------------------------------------------------------------
-sim-cocotb:
-	$(MAKE) -C tb/cocotb SIM=icarus
-
-sim-cocotb-verilator:
+sim:
 	$(MAKE) -C tb/cocotb SIM=verilator
 
 # -----------------------------------------------------------------------
@@ -37,24 +24,22 @@ lint:
 	          $(RTL_FILES) 2>&1
 
 # -----------------------------------------------------------------------
-# Waveform viewer
+# Waveform viewer (FST from Verilator)
 # -----------------------------------------------------------------------
 waves:
-	gtkwave tlul_apb_adapter.vcd &
+	gtkwave tb/cocotb/dump.fst &
 
 # -----------------------------------------------------------------------
 # Clean
 # -----------------------------------------------------------------------
 clean:
-	rm -f $(SIM_OUT) *.vcd *.fst
 	$(MAKE) -C tb/cocotb clean
+	rm -f *.vcd *.fst
 
 # -----------------------------------------------------------------------
 help:
 	@echo "Targets:"
-	@echo "  sim                - Compile and run SV testbench (iverilog)"
-	@echo "  sim-cocotb         - Run cocotb tests (icarus)"
-	@echo "  sim-cocotb-verilator - Run cocotb tests (verilator)"
-	@echo "  lint               - Run Verilator lint check"
-	@echo "  waves              - Open waveform in GTKWave"
-	@echo "  clean              - Remove build artifacts"
+	@echo "  sim    - Run cocotb test suite (Verilator)"
+	@echo "  lint   - Verilator lint check"
+	@echo "  waves  - Open FST waveform in GTKWave"
+	@echo "  clean  - Remove build artifacts"

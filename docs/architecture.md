@@ -229,7 +229,6 @@ tlul-apb-adapter/
 │   ├── tlul_pkg.sv              # TL-UL type definitions (optional, OpenTitan-compatible)
 │   └── tlul_apb_adapter.sv      # Main adapter module
 ├── tb/
-│   ├── tb_tlul_apb_adapter.sv   # SystemVerilog testbench (iverilog/verilator)
 │   └── cocotb/
 │       ├── Makefile             # cocotb simulation Makefile
 │       └── test_tlul_apb_adapter.py  # cocotb Python tests (TC01–TC09)

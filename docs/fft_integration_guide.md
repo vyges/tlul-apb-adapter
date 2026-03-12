@@ -204,15 +204,14 @@ int fft_run_1024(int16_t *real_in, int16_t *imag_in,
 To run the cocotb integration test from this repository:
 
 ```bash
-cd tb/cocotb
-SIM=icarus make MODULE=test_tlul_apb_adapter
+cd tb/cocotb && make
 ```
 
 For gate-level simulation after OpenLane synthesis:
 
 ```bash
 cd tb/cocotb
-SIM=icarus NETLIST=1 GATE_NETLIST=../../syn/tlul_apb_adapter_synth.v make
+NETLIST=1 GATE_NETLIST=../../syn/tlul_apb_adapter_synth.v make
 ```
 
 ---

@@ -229,14 +229,14 @@ d_ready ────────────────────────
 
 | TC# | Test Name | Stimulus | Expected | Simulator |
 |-----|-----------|----------|----------|-----------|
-| TC01 | Read zero-wait | Get, PREADY immediate | d_data=PRDATA, d_error=0 | iverilog, cocotb |
-| TC02 | Write zero-wait | PutFullData, PREADY immediate | AccessAck, d_error=0 | iverilog, cocotb |
-| TC03 | Partial write | PutPartialData, mask=0b0110 | PSTRB=0b0110 | iverilog, cocotb |
-| TC04 | Multi-cycle slave | Get, 3 wait cycles | d_data=PRDATA, d_error=0 | iverilog, cocotb |
-| TC05 | Back-to-back | Write then read | Both complete correctly | iverilog, cocotb |
-| TC06 | PSLVERR | Get, PSLVERR=1 | d_error=1 | iverilog, cocotb |
-| TC07 | d_ready backpressure | Get, d_ready held low | d_valid held until d_ready | iverilog, cocotb |
-| TC08 | Reset mid-transaction | Reset in APB_SETUP | Returns to IDLE cleanly | iverilog, cocotb |
+| TC01 | Read zero-wait | Get, PREADY immediate | d_data=PRDATA, d_error=0 | cocotb/verilator |
+| TC02 | Write zero-wait | PutFullData, PREADY immediate | AccessAck, d_error=0 | cocotb/verilator |
+| TC03 | Partial write | PutPartialData, mask=0b0110 | PSTRB=0b0110 | cocotb/verilator |
+| TC04 | Multi-cycle slave | Get, 3 wait cycles | d_data=PRDATA, d_error=0 | cocotb/verilator |
+| TC05 | Back-to-back | Write then read | Both complete correctly | cocotb/verilator |
+| TC06 | PSLVERR | Get, PSLVERR=1 | d_error=1 | cocotb/verilator |
+| TC07 | d_ready backpressure | Get, d_ready held low | d_valid held until d_ready | cocotb/verilator |
+| TC08 | Reset mid-transaction | Reset in APB_SETUP | Returns to IDLE cleanly | cocotb/verilator |
 | TC09 | Stress random | 20 random rd/wr, random waits | All match expected | cocotb |
 
 ### 6.2 Protocol Assertions
