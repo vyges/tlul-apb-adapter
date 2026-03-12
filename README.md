@@ -44,8 +44,8 @@ tb/
     Makefile
 
 docs/
-  design_specification.md  Interface definition, timing, verification plan
-  architecture.md          Internal architecture, design decisions
+  tlul_apb_adapter_design_specification.md  Interface definition, timing, verification plan
+  tlul_apb_adapter_architecture.md          Internal architecture, design decisions
   fft_integration_guide.md Step-by-step FFT APB integration example
 
 examples/

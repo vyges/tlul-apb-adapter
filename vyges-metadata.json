@@ -228,8 +228,8 @@
     "PSLVERR"
   ],
   "documentation": {
-    "overview": "docs/design_specification.md",
-    "architecture": "docs/architecture.md",
+    "overview": "docs/tlul_apb_adapter_design_specification.md",
+    "architecture": "docs/tlul_apb_adapter_architecture.md",
     "integration_guide": "docs/fft_integration_guide.md"
   },
   "examples": [
