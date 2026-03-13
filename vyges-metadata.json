@@ -19,9 +19,7 @@
     "containsEncryptedPayload": false,
     "indexing": true,
     "rtl_files": [
-      "rtl/tlul_apb_adapter.sv"
-    ],
-    "standalone_rtl_files": [
+      "rtl/tlul_apb_adapter.sv",
       "rtl/standalone/tlul_pkg.sv"
     ],
     "testbench_files": [
@@ -248,10 +246,25 @@
   ],
   "dependencies": [
     {
-      "name": "opentitan-tlul",
-      "source": "https://github.com/vyges-ip/opentitan-tlul",
-      "required_for": "soc_integration",
-      "note": "Required when using tlul_pkg struct types (tl_h2d_t, tl_d2h_t). Not required for standalone use — see rtl/standalone/tlul_pkg.sv for that case."
+      "dependency_info": {
+        "name": "opentitan-tlul",
+        "version": ">=1.0.0",
+        "type": "ip",
+        "optional": true
+      },
+      "source_management": {
+        "source": {
+          "type": "git",
+          "url": "https://github.com/vyges-ip/opentitan-tlul",
+          "commit": "main",
+          "indexing": true
+        },
+        "autoFetch": false
+      },
+      "compliance": {
+        "license": "Apache-2.0",
+        "attribution": "Copyright lowRISC contributors (OpenTitan project). Licensed under Apache-2.0."
+      }
     }
   ],
   "compatibility": {
