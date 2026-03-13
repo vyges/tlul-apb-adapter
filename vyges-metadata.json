@@ -10,7 +10,7 @@
   "design_type": ["digital"],
   "maturity": "prototype",
   "created": "2026-03-12T21:39:21Z",
-  "updated": "2026-03-12T21:39:21Z",
+  "updated": "2026-03-13T23:46:51Z",
   "source": {
     "type": "git",
     "url": "https://github.com/vyges/tlul-apb-adapter",
@@ -19,8 +19,10 @@
     "containsEncryptedPayload": false,
     "indexing": true,
     "rtl_files": [
-      "rtl/tlul_pkg.sv",
       "rtl/tlul_apb_adapter.sv"
+    ],
+    "standalone_rtl_files": [
+      "rtl/standalone/tlul_pkg.sv"
     ],
     "testbench_files": [
       "tb/tb_tlul_apb_adapter.sv",
@@ -234,12 +236,24 @@
   },
   "examples": [
     {
-      "name": "FFT TL-UL Wrapper",
-      "description": "Wrapper connecting the Vyges FFT Accelerator APB port to a TL-UL crossbar via tlul_apb_adapter",
+      "name": "FFT TL-UL Wrapper (flat signals)",
+      "description": "Wrapper connecting the Vyges FFT Accelerator APB port to a TL-UL crossbar via tlul_apb_adapter. Uses flat TL-UL port signals — suitable for standalone use or non-OpenTitan crossbars.",
       "file": "examples/fft_tlul_wrapper.sv"
+    },
+    {
+      "name": "FFT TL-UL Wrapper (struct interface — SoC integration pattern)",
+      "description": "Struct-interface variant using tlul_pkg::tl_h2d_t / tl_d2h_t. Use this pattern when integrating with soc-generator xbar, OpenTitan crossbar, or any SoC that uses tlul_pkg struct types. Requires opentitan-tlul.",
+      "file": "examples/fft_ctrl_tlul_struct.sv"
     }
   ],
-  "dependencies": [],
+  "dependencies": [
+    {
+      "name": "opentitan-tlul",
+      "source": "https://github.com/vyges-ip/opentitan-tlul",
+      "required_for": "soc_integration",
+      "note": "Required when using tlul_pkg struct types (tl_h2d_t, tl_d2h_t). Not required for standalone use — see rtl/standalone/tlul_pkg.sv for that case."
+    }
+  ],
   "compatibility": {
     "tools": {
       "synthesis": ["yosys", "design_compiler", "vivado", "quartus"],

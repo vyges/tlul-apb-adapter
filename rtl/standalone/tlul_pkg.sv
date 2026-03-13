@@ -1,7 +1,20 @@
 // Copyright 2026 Vyges Inc.
 // SPDX-License-Identifier: Apache-2.0
 //
-// TL-UL (TileLink Uncached Lightweight) Protocol Type Definitions
+// TL-UL (TileLink Uncached Lightweight) Protocol Type Definitions — STANDALONE COPY
+//
+// *** IMPORTANT ***
+// This file is provided ONLY for standalone use of tlul_apb_adapter without
+// the opentitan-tlul IP. It is a minimal subset of opentitan-tlul's tlul_pkg:
+//   - Missing: d_sink field, TL_DIW, TL_H2D_DEFAULT, TL_D2H_DEFAULT, integrity functions
+//
+// In a TL-UL SoC (with opentitan-rv-core-ibex, opentitan-uart, etc.) you MUST
+// use opentitan-tlul's tlul_pkg.sv instead. Do NOT add this directory to your
+// compile path if opentitan-tlul is already present — the `ifndef` guard will
+// prevent double-compilation, but this version is structurally incomplete
+// (missing d_sink) and will break code that references that field.
+//
+// Preferred: declare opentitan-tlul as a dependency and compile from there.
 //
 // This package defines the type definitions for the TL-UL protocol as
 // used in the OpenTitan project and compatible ecosystems (Ibex RISC-V core,
