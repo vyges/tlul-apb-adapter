@@ -17,6 +17,15 @@
 //   wrapper. If DMA-style bulk data transfer is needed, connect the
 //   AXI4 port directly to an AXI4-compatible bus master instead.
 //
+// Required boot sequence (firmware must follow this order):
+//   1. Write 512 twiddle words to FFT_BASE+0x800 .. FFT_BASE+0xBFC
+//      Format: { sin16[k][31:16], cos16[k][15:0] } Q1.15, k=0..511
+//      (paddr[11]=1 decoded by memory_interface as twiddle write)
+//   2. Write FFT_LENGTH register (FFT_BASE+0x00C)
+//   3. Assert FFT_CTRL[0]=1 (FFT_BASE+0x000) to start
+//   The adapter passes these transactions through unchanged; address
+//   decode is entirely within the FFT IP's memory_interface module.
+//
 // FFT IP reference: https://github.com/vyges/fast-fourier-transform-ip
 // Adapter reference: https://github.com/vyges/tlul-apb-adapter
 
