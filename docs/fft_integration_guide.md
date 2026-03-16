@@ -3,7 +3,7 @@
 -**IP Name:** tlul-apb-adapter  
 -**Version:** 0.1.0  
 -**Created:** 2026-03-12T22:17:25Z
--**Updated:** 2026-03-12T22:17:25Z
+-**Updated:** 2026-03-16T01:15:35Z
 -**Author:** Vyges IP Development Team 
 **Applies to:** `vyges/tlul-apb-adapter@0.1.0` + `vyges/fast-fourier-transform-ip`
 **Last updated:** 2026-03-12
@@ -130,74 +130,104 @@ the APB interface. Key registers (base = `0x3000_0000`):
 |--------|----------|--------|-------------|
 | `0x000` | `FFT_CTRL` | R/W | Control: `[0]=start`, `[1]=reset`, `[2]=rescale_en` |
 | `0x004` | `FFT_STATUS` | RO | Status: `[0]=busy`, `[1]=done`, `[2]=error` |
-| `0x008` | `FFT_LENGTH` | R/W | FFT length log2: `8`=256pt, `10`=1024pt, `12`=4096pt |
-| `0x00C` | `FFT_CONFIG` | R/W | Mode config: `[0]=double_buffer`, `[1]=scale_track` |
-| `0x010` | `FFT_SCALE` | RO | Current scale factor (auto-rescaling result) |
+| `0x008` | `FFT_CONFIG` | R/W | Mode config: `[0]=double_buffer`, `[1]=scale_track` |
+| `0x00C` | `FFT_LENGTH` | R/W | FFT point count: write `1024` for 1024-point |
+| `0x010` | `FFT_BUF_SEL`| R/W | Buffer select `[1:0]` |
 | `0x014` | `FFT_INT_EN` | R/W | Interrupt enable: `[0]=done_irq`, `[1]=error_irq` |
 | `0x018` | `FFT_INT_STAT`| R/W1C | Interrupt status (write 1 to clear) |
-| `0x100+` | `FFT_DATA[]` | R/W | Input/output sample data buffer |
+| `0x01C` | `FFT_SCALE`  | RO | Scale factor + stage count |
+| `0x020` | `RESCALE_CTRL`| R/W | Rescale mode, rounding, saturation |
+| `0x024` | `OVERFLOW`   | RO | Overflow status |
+| `0x800`–`0xBFC` | `TWIDDLE[0:511]` | WO | **Twiddle factor init window** — see §4.1 |
 
 > **Note:** The full register map is in the FFT IP documentation at
 > [github.com/vyges/fast-fourier-transform-ip](https://github.com/vyges/fast-fourier-transform-ip).
+
+### 4.1 Twiddle Factor Initialization
+
+The FFT engine requires twiddle factors to be loaded into SRAM before the
+first FFT is started. Twiddle factors are **not** hardcoded in ROM; they
+must be written by firmware via the APB twiddle write window.
+
+**Address decode:** `paddr[11] = 1` routes the APB write to the twiddle
+region. Address word offset `paddr[10:2]` selects twiddle entry `k ∈ [0..511]`:
+
+| APB `paddr` | Twiddle entry | `fft_memory` index |
+|-------------|---------------|--------------------|
+| `0x800` | `k=0` | 1024 |
+| `0x804` | `k=1` | 1025 |
+| … | … | … |
+| `0xBFC` | `k=511` | 1535 |
+
+**Data format (Q1.15 fixed-point, 32-bit word):**
+
+```
+bit[31:16]  sin(2πk/N)   Q1.15  (two's complement, 1.0 → 0x7FFF)
+bit[15:0]   cos(2πk/N)   Q1.15
+```
+
+**Firmware boot sequence (required):**
+
+1. Write 512 twiddle words to `FFT_BASE + 0x800` .. `FFT_BASE + 0xBFC`
+2. Write `FFT_LENGTH` (e.g. `1024`)
+3. Assert `FFT_CTRL[0] = 1` to start
+
+The twiddle table is pre-computed at build time by `fw/boot/gen_twiddle.py`
+in the edge-sensor-soc repo. See §5 below for the firmware example.
+
+**Why firmware init, not ROM?**
+
+The `twiddle_rom` module (`fft_twiddle_rom.sv`) in the FFT IP was never
+instantiated — it is deprecated dead code (see that file's header). Storing
+twiddle factors in the same SRAM array as data (`fft_data_sram`) eliminates
+the need for a 5th dedicated SRAM macro, saving ~0.05 mm² of die area.
 
 ---
 
 ## 5. Firmware Driver Example
 
-Sample bare-metal C driver for configuring and starting a 1024-point FFT:
+Sample bare-metal C driver. **Twiddle factors must be loaded before the
+first `fft_run` call.** In the edge-sensor-soc this is done in `boot.S`
+before the main loop; the table is pre-computed by `gen_twiddle.py`.
 
 ```c
 #include <stdint.h>
 
-#define FFT_BASE        0x30000000UL
-#define FFT_CTRL        (*(volatile uint32_t *)(FFT_BASE + 0x000))
-#define FFT_STATUS      (*(volatile uint32_t *)(FFT_BASE + 0x004))
-#define FFT_LENGTH      (*(volatile uint32_t *)(FFT_BASE + 0x008))
-#define FFT_CONFIG      (*(volatile uint32_t *)(FFT_BASE + 0x00C))
-#define FFT_INT_EN      (*(volatile uint32_t *)(FFT_BASE + 0x014))
-#define FFT_INT_STAT    (*(volatile uint32_t *)(FFT_BASE + 0x018))
-#define FFT_DATA(i)     (*(volatile uint32_t *)(FFT_BASE + 0x100 + (i)*4))
+#define FFT_BASE            0x40100000UL   // edge-sensor-soc assignment
+#define FFT_CTRL            (*(volatile uint32_t *)(FFT_BASE + 0x000))
+#define FFT_STATUS          (*(volatile uint32_t *)(FFT_BASE + 0x004))
+#define FFT_CONFIG          (*(volatile uint32_t *)(FFT_BASE + 0x008))
+#define FFT_LENGTH          (*(volatile uint32_t *)(FFT_BASE + 0x00C))
+#define FFT_INT_EN          (*(volatile uint32_t *)(FFT_BASE + 0x014))
+#define FFT_INT_STAT        (*(volatile uint32_t *)(FFT_BASE + 0x018))
+#define FFT_TWIDDLE(k)      (*(volatile uint32_t *)(FFT_BASE + 0x800 + (k)*4))
 
 #define FFT_CTRL_START      (1u << 0)
 #define FFT_CTRL_RESET      (1u << 1)
-#define FFT_CTRL_RESCALE_EN (1u << 2)
 #define FFT_STATUS_BUSY     (1u << 0)
 #define FFT_STATUS_DONE     (1u << 1)
 #define FFT_STATUS_ERROR    (1u << 2)
 
-// Load samples and run a 1024-point FFT
-int fft_run_1024(int16_t *real_in, int16_t *imag_in,
-                 int16_t *real_out, int16_t *imag_out) {
-    // Reset and configure
-    FFT_CTRL   = FFT_CTRL_RESET;
-    FFT_LENGTH = 10;               // log2(1024) = 10
-    FFT_CONFIG = 0x1;              // double-buffer enable
-    FFT_INT_EN = 0x3;              // enable done + error IRQs
-    FFT_CTRL   = FFT_CTRL_RESCALE_EN;
-
-    // Load input samples (packed real[15:0] | imag[15:0])
-    for (int i = 0; i < 1024; i++) {
-        FFT_DATA(i) = ((uint32_t)(uint16_t)real_in[i] << 16) |
-                       (uint32_t)(uint16_t)imag_in[i];
+// Call once at boot before any fft_run().
+// twiddle_table[k] = { sin16(k) [31:16], cos16(k) [15:0] }, Q1.15
+void fft_load_twiddle(const uint32_t *twiddle_table, int n_entries) {
+    for (int k = 0; k < n_entries; k++) {
+        FFT_TWIDDLE(k) = twiddle_table[k];
     }
+}
 
-    // Start FFT
-    FFT_CTRL |= FFT_CTRL_START;
+// Run a 1024-point FFT.  Caller provides pre-loaded input in FFT SRAM.
+int fft_run_1024(void) {
+    FFT_LENGTH = 1024;
+    FFT_INT_EN = 0x3;               // enable done + error IRQs
+    FFT_CTRL   = FFT_CTRL_START;
 
     // Poll for completion (or use interrupt handler)
     while (!(FFT_STATUS & FFT_STATUS_DONE)) {
         if (FFT_STATUS & FFT_STATUS_ERROR) return -1;
     }
 
-    // Read output samples
-    for (int i = 0; i < 1024; i++) {
-        uint32_t v = FFT_DATA(i);
-        real_out[i] = (int16_t)(v >> 16);
-        imag_out[i] = (int16_t)(v & 0xFFFF);
-    }
-
-    // Clear done interrupt
-    FFT_INT_STAT = FFT_INT_STAT;
+    FFT_INT_STAT = FFT_INT_STAT;    // clear done interrupt
     return 0;
 }
 ```
@@ -230,3 +260,5 @@ NETLIST=1 GATE_NETLIST=../../syn/tlul_apb_adapter_synth.v make
 | PSLVERR | FFT IP does not assert `pready_o`-gated error | Tie `apb_pslverr_i=1'b0` in adapter instantiation |
 | AXI port tie-off | AXI port inputs must not be left floating | Wrapper ties all AXI inputs to `0`/`1'b0` |
 | Interrupt polarity | `fft_done_o` is active-high | Standard for Ibex `irq_fast_i` |
+| Twiddle init required | FFT engine must not be started before twiddle factors are loaded | Load 512 words via `0x800–0xBFC` at boot; assert `FFT_CTRL[0]=1` only after |
+| Twiddle clock domain | `apb_twiddle_wr` fires on `pclk_i`; write goes to `fft_memory` (clocked on `clk_i`) | `pclk_i == clk_i` in edge-sensor-soc; add CDC synchroniser if clocks differ |
