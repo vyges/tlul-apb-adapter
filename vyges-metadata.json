@@ -6,60 +6,221 @@
   "description": "TileLink-UL to APB protocol bridge. Converts TL-UL slave transactions to APB master transactions, enabling any APB peripheral to connect to a TL-UL crossbar. Supports APB3 and APB4 (PSTRB, PPROT, PSLVERR). 3-cycle minimum latency, zero-wait-state and multi-cycle APB slaves. Vyges-original IP.",
   "license": "Apache-2.0",
   "maturity": "production",
-  "target": ["asic", "fpga"],
-  "design_type": ["digital"],
+  "target": [
+    "asic",
+    "fpga"
+  ],
+  "design_type": [
+    "digital"
+  ],
   "created": "2026-01-01T00:00:00Z",
   "updated": "2026-03-27T19:40:00Z",
-  "source": {"type": "git", "url": "https://github.com/vyges/tlul-apb-adapter", "private": false, "rtl_path": "rtl"},
-  "maintainers": [{"name": "Vyges", "email": "team@vyges.com", "github": "vyges"}],
+  "source": {
+    "type": "git",
+    "url": "https://github.com/vyges/tlul-apb-adapter",
+    "private": false,
+    "rtl_path": "rtl"
+  },
+  "maintainers": [
+    {
+      "name": "Vyges",
+      "email": "team@vyges.com",
+      "github": "vyges"
+    }
+  ],
   "interfaces": [
     {
-      "type": "bus", "direction": "slave", "protocol": "TL-UL", "port": "tl",
+      "type": "bus",
+      "direction": "slave",
+      "protocol": "TL-UL",
+      "port": "tl",
       "description": "TL-UL slave port (flat signals, not struct). Accepts Get, PutFullData, PutPartialData.",
       "signals": [
-        {"name": "clk_i", "direction": "input", "type": "clock", "width": 1},
-        {"name": "rst_ni", "direction": "input", "type": "reset", "width": 1, "active_level": "low"},
-        {"name": "tl_a_valid_i", "direction": "input", "width": 1},
-        {"name": "tl_a_opcode_i", "direction": "input", "width": 3},
-        {"name": "tl_a_param_i", "direction": "input", "width": 3},
-        {"name": "tl_a_size_i", "direction": "input", "width": 2},
-        {"name": "tl_a_source_i", "direction": "input", "width": 8},
-        {"name": "tl_a_address_i", "direction": "input", "width": 32},
-        {"name": "tl_a_mask_i", "direction": "input", "width": 4},
-        {"name": "tl_a_data_i", "direction": "input", "width": 32},
-        {"name": "tl_a_ready_o", "direction": "output", "width": 1},
-        {"name": "tl_d_valid_o", "direction": "output", "width": 1},
-        {"name": "tl_d_opcode_o", "direction": "output", "width": 3},
-        {"name": "tl_d_param_o", "direction": "output", "width": 2},
-        {"name": "tl_d_size_o", "direction": "output", "width": 2},
-        {"name": "tl_d_source_o", "direction": "output", "width": 8},
-        {"name": "tl_d_error_o", "direction": "output", "width": 1},
-        {"name": "tl_d_data_o", "direction": "output", "width": 32},
-        {"name": "tl_d_ready_i", "direction": "input", "width": 1}
+        {
+          "name": "clk_i",
+          "direction": "input",
+          "type": "clock",
+          "width": 1
+        },
+        {
+          "name": "rst_ni",
+          "direction": "input",
+          "type": "reset",
+          "width": 1,
+          "active_level": "low"
+        },
+        {
+          "name": "tl_a_valid_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "tl_a_opcode_i",
+          "direction": "input",
+          "width": 3
+        },
+        {
+          "name": "tl_a_param_i",
+          "direction": "input",
+          "width": 3
+        },
+        {
+          "name": "tl_a_size_i",
+          "direction": "input",
+          "width": 2
+        },
+        {
+          "name": "tl_a_source_i",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "tl_a_address_i",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "tl_a_mask_i",
+          "direction": "input",
+          "width": 4
+        },
+        {
+          "name": "tl_a_data_i",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "tl_a_ready_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "tl_d_valid_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "tl_d_opcode_o",
+          "direction": "output",
+          "width": 3
+        },
+        {
+          "name": "tl_d_param_o",
+          "direction": "output",
+          "width": 2
+        },
+        {
+          "name": "tl_d_size_o",
+          "direction": "output",
+          "width": 2
+        },
+        {
+          "name": "tl_d_source_o",
+          "direction": "output",
+          "width": 8
+        },
+        {
+          "name": "tl_d_error_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "tl_d_data_o",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "tl_d_ready_i",
+          "direction": "input",
+          "width": 1
+        }
       ]
     },
     {
-      "type": "bus", "direction": "master", "protocol": "APB", "port": "apb",
+      "type": "bus",
+      "direction": "master",
+      "protocol": "APB",
+      "port": "apb",
       "description": "APB master port. APB3 or APB4 (with PSTRB/PPROT/PSLVERR) based on APB4_EN parameter.",
       "signals": [
-        {"name": "apb_psel_o", "direction": "output", "width": 1},
-        {"name": "apb_penable_o", "direction": "output", "width": 1},
-        {"name": "apb_pwrite_o", "direction": "output", "width": 1},
-        {"name": "apb_paddr_o", "direction": "output", "width": 32},
-        {"name": "apb_pwdata_o", "direction": "output", "width": 32},
-        {"name": "apb_pstrb_o", "direction": "output", "width": 4},
-        {"name": "apb_pprot_o", "direction": "output", "width": 3},
-        {"name": "apb_prdata_i", "direction": "input", "width": 32},
-        {"name": "apb_pready_i", "direction": "input", "width": 1},
-        {"name": "apb_pslverr_i", "direction": "input", "width": 1}
+        {
+          "name": "apb_psel_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "apb_penable_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "apb_pwrite_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "apb_paddr_o",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "apb_pwdata_o",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "apb_pstrb_o",
+          "direction": "output",
+          "width": 4
+        },
+        {
+          "name": "apb_pprot_o",
+          "direction": "output",
+          "width": 3
+        },
+        {
+          "name": "apb_prdata_i",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "apb_pready_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "apb_pslverr_i",
+          "direction": "input",
+          "width": 1
+        }
       ]
     }
   ],
   "parameters": [
-    {"name": "AW", "type": "int", "default": 32, "description": "Address width (must match both TL-UL and APB)"},
-    {"name": "DW", "type": "int", "default": 32, "description": "Data width (must be 32 for standard TL-UL/APB)"},
-    {"name": "SOURCE_WIDTH", "type": "int", "default": 8, "description": "TL-UL source ID width (echoed to d_source)"},
-    {"name": "APB4_EN", "type": "int", "default": 1, "description": "1=APB4 (PSTRB, PPROT, PSLVERR), 0=APB3 only"}
+    {
+      "name": "AW",
+      "type": "int",
+      "default": 32,
+      "description": "Address width (must match both TL-UL and APB)"
+    },
+    {
+      "name": "DW",
+      "type": "int",
+      "default": 32,
+      "description": "Data width (must be 32 for standard TL-UL/APB)"
+    },
+    {
+      "name": "SOURCE_WIDTH",
+      "type": "int",
+      "default": 8,
+      "description": "TL-UL source ID width (echoed to d_source)"
+    },
+    {
+      "name": "APB4_EN",
+      "type": "int",
+      "default": 1,
+      "description": "1=APB4 (PSTRB, PPROT, PSLVERR), 0=APB3 only"
+    }
   ],
   "performance": {
     "latency": "3 cycles minimum (TL-UL accept → APB setup → APB access → TL-UL response). Additional cycles for multi-cycle APB slaves (PREADY extension).",
@@ -81,13 +242,74 @@
     ]
   },
   "dependencies": [],
-  "test": {"status": "passing", "simulators": ["verilator"], "notes": "Verified in edge-sensor-soc bridging FFT (APB) and mag_phase (APB) to TL-UL xbar. Vivado + Verilator."},
+  "test": {
+    "status": "passing",
+    "simulators": [
+      "verilator"
+    ],
+    "notes": "Verified in edge-sensor-soc bridging FFT (APB) and mag_phase (APB) to TL-UL xbar. Vivado + Verilator."
+  },
   "documentation": {},
-  "artifacts": {"rtl": ["rtl/tlul_apb_adapter.sv"], "total_rtl_lines": 265},
-  "categories": {"primary": "bus", "secondary": ["bridge", "infrastructure"], "tags": ["tl-ul", "apb", "bridge", "adapter", "protocol", "tilelink", "amba"]},
-  "trust": {"verification_level": "fpga_validated", "tapeout_count": 0, "fpga_validated": true, "maintained": true, "last_activity": "2026-03-27", "notes": "FPGA-validated in edge-sensor-soc (2 instances: FFT + CORDIC). Vivado Arty A7 + Verilator."},
-  "asic": {"flavor": "digital", "technology": ["sky130A"]},
-  "fpga": {"toolchain": ["Vivado", "Yosys"]},
-  "keywords": ["tl-ul", "apb", "bridge", "adapter", "tilelink", "amba", "protocol-conversion"],
-  "meta": {"template": {"generator": "manual (gold-standard pass 2026-03-27)"}, "schema": {"version": "1.0.0"}}
+  "artifacts": {
+    "rtl": [
+      "rtl/tlul_apb_adapter.sv"
+    ],
+    "total_rtl_lines": 265
+  },
+  "categories": {
+    "primary": "bus",
+    "secondary": [
+      "bridge",
+      "infrastructure"
+    ],
+    "tags": [
+      "tl-ul",
+      "apb",
+      "bridge",
+      "adapter",
+      "protocol",
+      "tilelink",
+      "amba"
+    ]
+  },
+  "trust": {
+    "verification_level": "fpga_validated",
+    "tapeout_count": 0,
+    "fpga_validated": true,
+    "maintained": true,
+    "last_activity": "2026-03-27",
+    "notes": "FPGA-validated in edge-sensor-soc (2 instances: FFT + CORDIC). Vivado Arty A7 + Verilator."
+  },
+  "asic": {
+    "flavor": "digital",
+    "technology": [
+      "sky130A"
+    ]
+  },
+  "fpga": {
+    "toolchain": [
+      "Vivado",
+      "Yosys"
+    ]
+  },
+  "keywords": [
+    "tl-ul",
+    "apb",
+    "bridge",
+    "adapter",
+    "tilelink",
+    "amba",
+    "protocol-conversion"
+  ],
+  "meta": {
+    "template": {
+      "generator": "manual (gold-standard pass 2026-03-27)"
+    },
+    "schema": {
+      "version": "1.0.0"
+    }
+  },
+  "branding": {
+    "display_name": "TL-UL to APB Bridge"
+  }
 }
