@@ -14,7 +14,7 @@
     "digital"
   ],
   "created": "2026-01-01T00:00:00Z",
-  "updated": "2026-03-27T19:40:00Z",
+  "updated": "2026-04-02T03:11:53Z",
   "source": {
     "type": "git",
     "url": "https://github.com/vyges/tlul-apb-adapter",
@@ -256,8 +256,24 @@
     ],
     "total_rtl_lines": 265
   },
+  "rtl_files": [
+    "rtl/tlul_apb_adapter.sv"
+  ],
+  "rtl_quality": {
+    "module_prefixed": true,
+    "defines_prefixed": true,
+    "header_guards": true,
+    "one_module_per_file": true,
+    "self_contained_includes": true,
+    "no_translate_pragmas": false,
+    "lint_clean": false,
+    "no_casex": true,
+    "width_clean": true,
+    "no_sv_keyword_conflicts": true
+  },
+  "defines": [],
   "categories": {
-    "primary": "bus",
+    "primary": "Base Libraries",
     "secondary": [
       "bridge",
       "infrastructure"
