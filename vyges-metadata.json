@@ -223,7 +223,7 @@
     }
   ],
   "performance": {
-    "latency": "3 cycles minimum (TL-UL accept → APB setup → APB access → TL-UL response). Additional cycles for multi-cycle APB slaves (PREADY extension).",
+    "latency": "3 cycles minimum (TL-UL accept \u2192 APB setup \u2192 APB access \u2192 TL-UL response). Additional cycles for multi-cycle APB slaves (PREADY extension).",
     "throughput": "1 transaction at a time (single-outstanding, TL-UL uncached constraint)",
     "gate_count": "~300 cells (estimated, sky130)"
   },
@@ -232,12 +232,12 @@
     "features": [
       "TL-UL slave to APB master protocol conversion",
       "APB3 and APB4 support (APB4_EN parameter)",
-      "TL-UL Get → APB Read, PutFullData/PutPartialData → APB Write",
+      "TL-UL Get \u2192 APB Read, PutFullData/PutPartialData \u2192 APB Write",
       "PSTRB byte enables from TL-UL a_mask (APB4 mode)",
       "PSLVERR propagation to TL-UL d_error",
       "Single-outstanding transaction (TL-UL uncached)",
       "3-cycle minimum latency (zero-wait APB slave)",
-      "Flat TL-UL signals (not struct) — wrapper needed for struct-based xbar",
+      "Flat TL-UL signals (not struct) \u2014 wrapper needed for struct-based xbar",
       "1 RTL file, 265 lines"
     ]
   },
@@ -327,5 +327,79 @@
   },
   "branding": {
     "display_name": "TL-UL to APB Bridge"
+  },
+  "integration": {
+    "soc_generator_hints": {
+      "top_module": "tlul_apb_adapter",
+      "clock": {
+        "port": "clk_i"
+      },
+      "reset": {
+        "port": "rst_ni",
+        "polarity": "active_low"
+      },
+      "role": "bridge",
+      "upstream": {
+        "protocol": "TL-UL",
+        "style": "flat",
+        "note": "Uses flat TL-UL signals (not tlul_pkg struct types). Wrapper must flatten structs before connecting.",
+        "ports": {
+          "a_valid": "tl_a_valid_i",
+          "a_opcode": "tl_a_opcode_i",
+          "a_param": "tl_a_param_i",
+          "a_size": "tl_a_size_i",
+          "a_source": "tl_a_source_i",
+          "a_address": "tl_a_address_i",
+          "a_mask": "tl_a_mask_i",
+          "a_data": "tl_a_data_i",
+          "a_ready": "tl_a_ready_o",
+          "d_valid": "tl_d_valid_o",
+          "d_opcode": "tl_d_opcode_o",
+          "d_param": "tl_d_param_o",
+          "d_size": "tl_d_size_o",
+          "d_source": "tl_d_source_o",
+          "d_error": "tl_d_error_o",
+          "d_data": "tl_d_data_o",
+          "d_ready": "tl_d_ready_i"
+        }
+      },
+      "downstream": {
+        "protocol": "APB",
+        "ports": {
+          "psel": "apb_psel_o",
+          "penable": "apb_penable_o",
+          "pwrite": "apb_pwrite_o",
+          "paddr": "apb_paddr_o",
+          "pwdata": "apb_pwdata_o",
+          "pstrb": "apb_pstrb_o",
+          "pprot": "apb_pprot_o",
+          "prdata": "apb_prdata_i",
+          "pready": "apb_pready_i",
+          "pslverr": "apb_pslverr_i"
+        }
+      },
+      "parameters": [
+        {
+          "name": "AW",
+          "maps_to": "config.AW",
+          "default": 32
+        },
+        {
+          "name": "DW",
+          "maps_to": "config.DW",
+          "default": 32
+        },
+        {
+          "name": "SOURCE_WIDTH",
+          "maps_to": "config.SOURCE_WIDTH",
+          "default": 8
+        },
+        {
+          "name": "APB4_EN",
+          "maps_to": "config.APB4_EN",
+          "default": 1
+        }
+      ]
+    }
   }
 }
