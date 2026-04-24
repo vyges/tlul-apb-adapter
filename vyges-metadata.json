@@ -134,7 +134,8 @@
           "direction": "input",
           "width": 1
         }
-      ]
+      ],
+      "protocol_level": "baseline"
     },
     {
       "type": "bus",
