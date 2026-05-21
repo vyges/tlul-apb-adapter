@@ -14,7 +14,7 @@
     "digital"
   ],
   "created": "2026-01-01T00:00:00Z",
-  "updated": "2026-05-21T20:30:54Z",
+  "updated": "2026-05-21T20:43:14Z",
   "source": {
     "type": "git",
     "url": "https://github.com/vyges/tlul-apb-adapter",
@@ -239,7 +239,8 @@
       "Single-outstanding transaction (TL-UL uncached)",
       "3-cycle minimum latency (zero-wait APB slave)",
       "Flat TL-UL signals (not struct) \u2014 wrapper needed for struct-based xbar",
-      "1 RTL file, 265 lines"
+      "Combined sub-bus adapter (tlul_apb_bus_adapter) with 1×N APB fan-out and per-slave address decode",
+      "2 RTL files, 417 lines"
     ]
   },
   "dependencies": [],
@@ -253,7 +254,8 @@
   "documentation": {},
   "artifacts": {
     "rtl": [
-      "rtl/tlul_apb_adapter.sv"
+      "rtl/tlul_apb_adapter.sv",
+      "rtl/tlul_apb_bus_adapter.sv"
     ],
     "total_rtl_lines": 417
   },
