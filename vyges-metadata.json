@@ -243,7 +243,18 @@
       "2 RTL files, 417 lines"
     ]
   },
-  "dependencies": [],
+  "dependencies": [
+    {
+      "name": "opentitan-prim",
+      "version": "*",
+      "purpose": "prim_mubi_pkg — multi-bit-bool types used by the signed TL-UL signing pipeline (vyges_tlul_reg_slave) emitted for this adapter. Matches tlul-axi-bridge. opentitan-tlul is intentionally NOT depended on: this adapter bundles its own standalone tlul_pkg (rtl/standalone/), so adding opentitan-tlul would duplicate tlul_pkg (MODDUP)."
+    },
+    {
+      "name": "opentitan-prim-generic",
+      "version": "*",
+      "purpose": "generic prim implementations backing opentitan-prim"
+    }
+  ],
   "test": {
     "status": "passing",
     "simulators": [
