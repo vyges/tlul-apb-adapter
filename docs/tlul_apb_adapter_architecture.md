@@ -104,6 +104,7 @@ channel      │  Output Mux  │
 | `Get` | `3'h4` | Read | 0 |
 | `PutFullData` | `3'h0` | Write (all bytes) | 1 |
 | `PutPartialData` | `3'h1` | Write (selected bytes) | 1 |
+| any other | — | None: `AccessAck` with `d_error=1`, data 0 | — |
 
 ### 3.2 APB Response → TL-UL D Channel
 
@@ -120,7 +121,7 @@ channel      │  Output Mux  │
 
 | Mode | PSTRB Source |
 |------|-------------|
-| `APB4_EN = 1` | `tl_a_mask_i` (4-bit byte enables from TL-UL) |
+| `APB4_EN = 1` | `tl_a_mask_i` on writes (4-bit byte enables from TL-UL); `4'h0` on reads |
 | `APB4_EN = 0` | `4'hF` (all bytes enabled, APB3 behavior) |
 
 ---

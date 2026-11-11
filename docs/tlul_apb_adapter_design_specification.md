@@ -45,7 +45,7 @@ These constraints align naturally with APB, making a lightweight adapter viable 
 
 | Feature | APB3 | APB4 (`APB4_EN=1`) |
 |---------|------|---------------------|
-| PSTRB (write strobes) | Not available | Driven from `tl_a_mask_i` |
+| PSTRB (write strobes) | Not available | Driven from `tl_a_mask_i` on writes, `0` on reads |
 | PPROT (protection) | Not available | Driven as `3'b000` |
 | PSLVERR | Not observed | Mapped to `tl_d_error_o` |
 
@@ -86,12 +86,12 @@ When `APB4_EN = 0`: PSTRB is driven `4'hF` (all bytes enabled), PSLVERR is ignor
 | Signal | Direction | Width | Description |
 |--------|-----------|-------|-------------|
 | `tl_d_valid_o` | Output | 1 | D channel valid |
-| `tl_d_opcode_o` | Output | 3 | `0=AccessAck` (write), `1=AccessAckData` (read) |
+| `tl_d_opcode_o` | Output | 3 | `0=AccessAck` (write, unsupported opcode), `1=AccessAckData` (read) |
 | `tl_d_param_o` | Output | 2 | Always `2'b00` |
 | `tl_d_size_o` | Output | 2 | Echo of `tl_a_size_i` |
 | `tl_d_source_o` | Output | `SOURCE_WIDTH` | Echo of `tl_a_source_i` |
-| `tl_d_error_o` | Output | 1 | Error: `1` if PSLVERR asserted (APB4 only) |
-| `tl_d_data_o` | Output | `DW` | Read data (`32'h0` for writes) |
+| `tl_d_error_o` | Output | 1 | Error: `1` if PSLVERR asserted (APB4 only) or the opcode is unsupported (§4.4) |
+| `tl_d_data_o` | Output | `DW` | Read data (`32'h0` for writes and errored unsupported opcodes) |
 | `tl_d_ready_i` | Input | 1 | Host ready to accept D channel response |
 
 ### 3.3 APB Master Ports
@@ -103,7 +103,7 @@ When `APB4_EN = 0`: PSTRB is driven `4'hF` (all bytes enabled), PSLVERR is ignor
 | `apb_pwrite_o` | Output | 1 | `1` = write, `0` = read |
 | `apb_paddr_o` | Output | `AW` | Address |
 | `apb_pwdata_o` | Output | `DW` | Write data |
-| `apb_pstrb_o` | Output | `DBW` | Write strobes (`APB4_EN=1`: from mask; else `4'hF`) |
+| `apb_pstrb_o` | Output | `DBW` | Write strobes (`APB4_EN=1`: mask on writes, `0` on reads; else `4'hF`) |
 | `apb_pprot_o` | Output | 3 | Protection (`3'b000` — unprivileged, non-secure, data) |
 | `apb_prdata_i` | Input | `DW` | Read data from peripheral |
 | `apb_pready_i` | Input | 1 | Peripheral ready (extends access phase when low) |
@@ -168,15 +168,29 @@ d_valid:                                 ╱   ╲
 
 Identical state machine to read. In `TL_RESP`, `tl_d_opcode_o = AccessAck` (no data). `tl_d_data_o` is driven to `32'h0`.
 
-### 4.4 PREADY Extension
+### 4.4 Unsupported Opcodes
+
+An A-channel opcode other than `Get`, `PutFullData` and `PutPartialData` is accepted and answered
+without an APB transfer: the FSM goes from `IDLE` straight to `TL_RESP`, and the response is
+`AccessAck` with `tl_d_error_o = 1` and `tl_d_data_o = 0` (latency 1 cycle). This matches the
+OpenTitan TL-UL error responder, which answers every opcode except `Get` with `AccessAck`.
+
+### 4.5 Unmapped Addresses (`tlul_apb_bus_adapter`)
+
+In `tlul_apb_bus_adapter`, an address that no `ADDR_BASES`/`ADDR_MASKS` window decodes selects no
+slave (`psel_o = 0`). The transfer completes at once with `PSLVERR` raised internally, so the
+TL-UL response carries `tl_d_error_o = 1` and zero data: writes reach no slave and reads return 0.
+The error is reported only when `APB4_EN = 1`, since APB3 mode ignores `PSLVERR`.
+
+### 4.6 PREADY Extension
 
 If an APB slave de-asserts `PREADY` (inserts wait states), the adapter remains in `APB_ACCESS` until `PREADY` is sampled high. There is no limit on wait cycles enforced by the adapter; a higher-level bus timeout mechanism may be required for robustness.
 
-### 4.5 D-Channel Back-Pressure
+### 4.7 D-Channel Back-Pressure
 
 Once `tl_d_valid_o` is asserted, it remains asserted until `tl_d_ready_i` is sampled high. The adapter does not accept a new A-channel request (`tl_a_ready_o = 0`) during this time. This upholds the TL-UL ordering constraint.
 
-### 4.6 Reset Behavior
+### 4.8 Reset Behavior
 
 On the de-assertion of `rst_ni`:
 - FSM returns to `IDLE`
@@ -194,6 +208,7 @@ On the de-assertion of `rst_ni`:
 | Zero-wait APB slave | 3 (SETUP + ACCESS + RESP) |
 | N-wait-cycle APB slave | 3 + N |
 | D-channel back-pressure (+M cycles) | 3 + M |
+| Unsupported opcode (§4.4) | 1 (RESP only) |
 
 ### 5.2 Throughput
 
