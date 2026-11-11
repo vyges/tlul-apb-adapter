@@ -133,11 +133,13 @@ module tlul_apb_bus_adapter #(
 
   // ── prdata / pready / pslverr mux from selected slave ───────────────────
   // psel_o is one-hot by construction (address ranges must not overlap).
-  // Default (no match) returns 0 / ready / no-error to avoid bus stalls.
+  // An address no window decodes selects no slave and completes at once
+  // with an error (PSLVERR, so d_error on the TL-UL side) and zero data:
+  // writes reach no slave and reads return 0. The error needs APB4_EN.
   always_comb begin
     apb_prdata  = '0;
     apb_pready  = 1'b1;
-    apb_pslverr = 1'b0;
+    apb_pslverr = 1'b1;
     for (int i = 0; i < NUM_SLAVES; i = i + 1) begin
       if (psel_o[i]) begin
         apb_prdata  = prdata_flat_i[i*DW +: DW];
