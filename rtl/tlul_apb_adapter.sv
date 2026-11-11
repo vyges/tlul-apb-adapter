@@ -209,6 +209,7 @@ module tlul_apb_adapter #(
   // APB master drive
   // -------------------------------------------------------------------------
 
+  // APB4: PSTRB carries the byte mask for writes and is driven low for reads.
   always_comb begin
     apb_psel_o    = 1'b0;
     apb_penable_o = 1'b0;
@@ -225,7 +226,7 @@ module tlul_apb_adapter #(
         apb_pwrite_o = req_write_q;
         apb_paddr_o  = req_addr_q;
         apb_pwdata_o = req_wdata_q;
-        apb_pstrb_o  = APB4_EN ? req_mask_q : {DBW{1'b1}};
+        apb_pstrb_o  = APB4_EN ? (req_write_q ? req_mask_q : '0) : {DBW{1'b1}};
       end
       APB_ACCESS: begin
         apb_psel_o   = 1'b1;
@@ -233,7 +234,7 @@ module tlul_apb_adapter #(
         apb_pwrite_o = req_write_q;
         apb_paddr_o  = req_addr_q;
         apb_pwdata_o = req_wdata_q;
-        apb_pstrb_o  = APB4_EN ? req_mask_q : {DBW{1'b1}};
+        apb_pstrb_o  = APB4_EN ? (req_write_q ? req_mask_q : '0) : {DBW{1'b1}};
       end
       default: ;
     endcase
