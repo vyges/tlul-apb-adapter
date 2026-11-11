@@ -145,6 +145,12 @@ module tlul_apb_adapter #(
   assign is_write = (tl_a_opcode_i == TL_OP_PUT_FULL) ||
                     (tl_a_opcode_i == TL_OP_PUT_PARTIAL);
 
+  // Any opcode other than Get, PutFullData and PutPartialData is not
+  // supported: it is answered with an AccessAck carrying d_error and never
+  // reaches the APB slave.
+  logic is_illegal;
+  assign is_illegal = !is_write && (tl_a_opcode_i != TL_OP_GET);
+
   // -------------------------------------------------------------------------
   // State register
   // -------------------------------------------------------------------------
@@ -167,7 +173,7 @@ module tlul_apb_adapter #(
       req_size_q   <= '0;
       req_source_q <= '0;
     end else if (state_q == IDLE && tl_a_valid_i) begin
-      req_write_q  <= is_write;
+      req_write_q  <= is_write || is_illegal;   // AccessAck, no data
       req_addr_q   <= tl_a_address_i;
       req_wdata_q  <= tl_a_data_i;
       req_mask_q   <= tl_a_mask_i;
@@ -184,6 +190,9 @@ module tlul_apb_adapter #(
     if (!rst_ni) begin
       rsp_rdata_q <= '0;
       rsp_error_q <= 1'b0;
+    end else if (state_q == IDLE && tl_a_valid_i) begin
+      rsp_rdata_q <= '0;
+      rsp_error_q <= is_illegal;
     end else if (state_q == APB_ACCESS && apb_pready_i) begin
       rsp_rdata_q <= apb_prdata_i;
       rsp_error_q <= APB4_EN ? apb_pslverr_i : 1'b0;
@@ -197,7 +206,7 @@ module tlul_apb_adapter #(
   always_comb begin
     state_d = state_q;
     case (state_q)
-      IDLE:       if (tl_a_valid_i)        state_d = APB_SETUP;
+      IDLE:       if (tl_a_valid_i)        state_d = is_illegal ? TL_RESP : APB_SETUP;
       APB_SETUP:                            state_d = APB_ACCESS;
       APB_ACCESS: if (apb_pready_i)        state_d = TL_RESP;
       TL_RESP:    if (tl_d_ready_i)        state_d = IDLE;
